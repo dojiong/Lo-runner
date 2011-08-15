@@ -84,6 +84,9 @@ char * const* genRunArgs(PyObject *args_obj)
     const char **args;
     int len, i;
     
+    if(!PyList_Check(args_obj))
+        RAISE0("args must be a list")
+    
     len = PyList_GET_SIZE(args_obj);
     args = (const char**)malloc(sizeof(char*) * (len+1));
     

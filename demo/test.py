@@ -61,7 +61,7 @@ def judge(src_path, td_path, td_total):
             rst['result'] = RESULT_STR[rst['result']]
             print rst
         else:
-            print 'testdata:%d incompleted'
+            print 'testdata:%d incompleted'%i
             os.remove('./m')
             exit(-1)
     os.remove('./m')

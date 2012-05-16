@@ -3,12 +3,12 @@
 
 from distutils.core import setup, Extension
 
-baserun = Extension('lorun',
-                sources = ['lorun.c','convert.c','access.c','limit.c','run.c','diff.c'],
+baserun = Extension('baserun',
+                sources = ['baserun.c','convert.c','access.c','limit.c','run.c','diff.c'],
                 )
 
-setup (name = 'lorun',
+setup (name = 'baserun',
        version = '1.0',
-       description = 'loco program runner core',
+       description = 'baserun judge',
        ext_modules = [baserun]
       )

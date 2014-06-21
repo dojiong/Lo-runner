@@ -18,13 +18,13 @@ RESULT_STR = [
 
 def compileSrc(src_path):
     if os.system('gcc %s -o m'%src_path) != 0:
-        print 'compile failure!'
+        print('compile failure!')
         return False
     return True
 
 def runone(p_path, in_path, out_path):
-    fin = file(in_path)
-    ftemp = file('temp.out', 'w')
+    fin = open(in_path)
+    ftemp = open('temp.out', 'w')
     
     runcfg = {
         'args':['./m'],
@@ -39,8 +39,8 @@ def runone(p_path, in_path, out_path):
     ftemp.close()
     
     if rst['result'] == 0:
-        ftemp = file('temp.out')
-        fout = file(out_path)
+        ftemp = open('temp.out')
+        fout = open(out_path)
         crst = lorun.check(fout.fileno(), ftemp.fileno())
         fout.close()
         ftemp.close()
@@ -53,15 +53,15 @@ def runone(p_path, in_path, out_path):
 def judge(src_path, td_path, td_total):
     if not compileSrc(src_path):
         return
-    for i in xrange(td_total):
+    for i in range(td_total):
         in_path = os.path.join(td_path, '%d.in'%i)
         out_path = os.path.join(td_path, '%d.out'%i)
         if os.path.isfile(in_path) and os.path.isfile(out_path):
             rst = runone('./m', in_path, out_path)
             rst['result'] = RESULT_STR[rst['result']]
-            print rst
+            print(rst)
         else:
-            print 'testdata:%d incompleted'%i
+            print('testdata:%d incompleted' % i)
             os.remove('./m')
             exit(-1)
     os.remove('./m')
@@ -69,36 +69,6 @@ def judge(src_path, td_path, td_total):
 if __name__ == '__main__':
     import sys
     if len(sys.argv) != 4:
-        print 'Usage:%s srcfile testdata_pth testdata_total'
+        print('Usage:%s srcfile testdata_pth testdata_total')
         exit(-1)
     judge(sys.argv[1], sys.argv[2], int(sys.argv[3]))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

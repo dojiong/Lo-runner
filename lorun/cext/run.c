@@ -16,14 +16,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#define _GNU_SOURCE
+#include "run.h"
 #include <sys/ptrace.h>
+#include <sys/resource.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/user.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include "run.h"
 #include "access.h"
 #include "limit.h"
 
@@ -85,13 +85,12 @@ int traceLoop(struct Runobj *runobj, struct Result *rst, pid_t pid) {
                         * (sysconf(_SC_PAGESIZE) / 1024);
 
                 rst->judge_result = RE;
-                if (ret == ACCESS_CALL_ERR)
-#if __WORDSIZE == 64
-                    rst->re_call = regs.orig_rax;
-#else
-                    rst->re_call = regs.orig_eax;
-#endif
-                    else rst->re_file = lastFileAccess();
+                if (ret == ACCESS_CALL_ERR) {
+                    rst->re_call = REG_SYS_CALL(&regs);
+                } else {
+                    rst->re_file = lastFileAccess();
+                    rst->re_file_flag = REG_ARG_2(&regs);
+                }
                 return 0;
             }
             incall = 0;

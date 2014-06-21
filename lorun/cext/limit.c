@@ -26,6 +26,7 @@ const char *last_limit_err;
 int setResLimit(void) {
 #define RAISE_EXIT(err) {last_limit_err = err;return -1;}
     struct rlimit rl;
+    struct itimerval p_realt;
 
     rl.rlim_cur = time_limit / 1000 + 2;
     rl.rlim_max = rl.rlim_cur + 1;
@@ -42,7 +43,6 @@ int setResLimit(void) {
     if (setrlimit(RLIMIT_STACK, &rl))
         RAISE_EXIT("set RLIMIT_STACK failure");
 
-    struct itimerval p_realt;
     p_realt.it_interval.tv_sec = time_limit / 1000 + 3;
     p_realt.it_interval.tv_usec = 0;
     p_realt.it_value = p_realt.it_interval;

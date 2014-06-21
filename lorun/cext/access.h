@@ -26,6 +26,16 @@
 #define ACCESS_FILE_ERR 2
 #define ACCESS_OK 0
 
+#if __WORDSIZE == 64
+    #define REG_SYS_CALL(x) ((x)->orig_rax)
+    #define REG_ARG_1(x) ((x)->rdi)
+    #define REG_ARG_2(x) ((x)->rsi)
+#else
+    #define REG_SYS_CALL(x) ((x)->orig_eax)
+    #define REG_ARG_1(x) ((x)->ebx)
+    #define REG_ARG_2(x) ((x)->ecx)
+#endif
+
 int checkAccess(struct Runobj *runobj, int pid, struct user_regs_struct *regs);
 const char* lastFileAccess(void);
 

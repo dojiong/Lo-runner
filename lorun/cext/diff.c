@@ -31,6 +31,7 @@ int equalStr(const char *s, const char *s2) {
 #define RETURN(rst) {*result = rst;return 0;}
 int checkDiff(int rightout_fd, int userout_fd, int *result) {
     char *userout, *rightout;
+    const char *cuser, *cright, *end_user, *end_right;
 
     off_t userout_len, rightout_len;
     userout_len = lseek(userout_fd, 0, SEEK_END);
@@ -69,9 +70,10 @@ int checkDiff(int rightout_fd, int userout_fd, int *result) {
         RETURN(AC);
     }
 
-    const char *cuser = userout, *cright = rightout;
-    const char *end_user = userout + userout_len;
-    const char *end_right = rightout + rightout_len;
+    cuser = userout;
+    cright = rightout;
+    end_user = userout + userout_len;
+    end_right = rightout + rightout_len;
     while ((cuser < end_user) && (cright < end_right)) {
         while ((cuser < end_user)
                 && (*cuser == ' ' || *cuser == '\n' || *cuser == '\r'

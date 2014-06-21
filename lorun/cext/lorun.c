@@ -31,7 +31,7 @@ int initRun(struct Runobj *runobj, PyObject *args)
         RAISE1("initRun parseTuple failure");
     if(!PyDict_Check(config)) RAISE1("argument must be a dict");
     
-    if((args_obj = PyDict_GetItemString(config,"args")) == NULL)
+    if((args_obj = PyDict_GetItemString(config, "args")) == NULL)
         RAISE1("must supply args");
     
     if((runobj->args = genRunArgs(args_obj)) == NULL) return -1;
@@ -46,30 +46,30 @@ int initRun(struct Runobj *runobj, PyObject *args)
         runobj->fd_err = -1;
     else runobj->fd_err = PyLong_AsLong(fd_obj);
       
-    if((time_obj = PyDict_GetItemString(config,"timelimit")) == NULL)
+    if((time_obj = PyDict_GetItemString(config, "timelimit")) == NULL)
         RAISE1("must supply timelimit");
     runobj->time_limit = PyLong_AsLong(time_obj);
     
-    if((memory_obj = PyDict_GetItemString(config,"memorylimit")) == NULL)
+    if((memory_obj = PyDict_GetItemString(config, "memorylimit")) == NULL)
         RAISE1("must supply memorylimit");
     runobj->memory_limit = PyLong_AsLong(memory_obj);
     
-    if((runner_obj = PyDict_GetItemString(config,"runner")) == NULL)
+    if((runner_obj = PyDict_GetItemString(config, "runner")) == NULL)
         runobj->runner = -1;
     else
         runobj->runner = PyLong_AsLong(runner_obj);
     
-    if((trace_obj = PyDict_GetItemString(config,"trace")) != NULL){
+    if((trace_obj = PyDict_GetItemString(config, "trace")) != NULL){
         if(trace_obj == Py_True){
             runobj->trace = 1;
             //trace mode: supply calls and files to access.
-            if((calls_obj = PyDict_GetItemString(config,"calls")) == NULL)
+            if((calls_obj = PyDict_GetItemString(config, "calls")) == NULL)
                 RAISE1("trace == True, so you must specify calls.");
             if(!PyList_Check(calls_obj))
                 RAISE1("calls must be a list.");
             if(initCalls(calls_obj, runobj->inttable)) return -1;
             
-            if((runobj->files = PyDict_GetItemString(config,"files")) == NULL)
+            if((runobj->files = PyDict_GetItemString(config, "files")) == NULL)
                 RAISE1("trace == True, so you must specify files.");
             if(!PyDict_Check(runobj->files))
                 RAISE1("files must be a dcit.");
@@ -123,13 +123,71 @@ PyObject* check(PyObject *self, PyObject *args)
 
 #define check_description "check(right_fd, userout_fd)\n"
 
-static PyMethodDef lorunMethods[]={
+static PyMethodDef lorun_methods[] = {
 	{"run", run, METH_VARARGS, run_description},
 	{"check", check, METH_VARARGS, check_description},
 	{NULL, NULL, 0, NULL}
 };
 
-PyMODINIT_FUNC initlorun(void)
-{
-	(void) Py_InitModule("lorun",lorunMethods);
+
+struct module_state {
+    PyObject *error;
+};
+
+#ifdef IS_PY3
+
+#define GETSTATE(m) ((struct module_state*)PyModule_GetState(m))
+static int lorun_ext_traverse(PyObject *m, visitproc visit, void *arg) {
+    Py_VISIT(GETSTATE(m)->error);
+    return 0;
 }
+
+static int lorun_ext_clear(PyObject *m) {
+    Py_CLEAR(GETSTATE(m)->error);
+    return 0;
+}
+
+static struct PyModuleDef moduledef = {
+        PyModuleDef_HEAD_INIT,
+        "_lorun_ext",
+        NULL,
+        sizeof(struct module_state),
+        lorun_methods,
+        NULL,
+        lorun_ext_traverse,
+        lorun_ext_clear,
+        NULL
+};
+
+PyObject *PyInit__lorun_ext(void) {
+    struct module_state *st;
+    PyObject *module = PyModule_Create(&moduledef);
+    if (module == NULL)
+        return NULL;
+
+    st = GETSTATE(module);
+    st->error = PyErr_NewException("_lorun_ext.Error", NULL, NULL);
+    if (st->error == NULL) {
+        Py_DECREF(module);
+        return NULL;
+    }
+
+    return module;
+}
+
+#else
+
+static struct module_state _state;
+void init_lorun_ext(void) {
+    PyObject *module = Py_InitModule("_lorun_ext", lorun_methods);
+    if (module == NULL) {
+        return;
+    }
+
+    _state.error = PyErr_NewException("_lorun_ext.Error", NULL, NULL);
+    if (_state.error == NULL) {
+        Py_DECREF(module);
+        return;
+    }
+}
+#endif

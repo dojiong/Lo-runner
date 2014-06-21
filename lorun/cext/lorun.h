@@ -18,13 +18,13 @@
 
 #ifndef __LO_GCC_HEADER
 #define __LO_GCC_HEADER
-#define _GNU_SOURCE
-#include <python2.6/Python.h>
+
+#include <Python.h>
 #include <sys/types.h>
 #define CALLS_MAX 400
 #define MAX_OUTPUT 100000000
 
-enum JUDGE_RESULT{
+enum JUDGE_RESULT {
     AC=0,   //0 Accepted
     PE,	    //1 Presentation Error
     TLE,	//2 Time Limit Exceeded
@@ -36,12 +36,13 @@ enum JUDGE_RESULT{
     SE,     //8 System Error
 };
 
-struct Result{
+struct Result {
     int judge_result; //JUDGE_RESULT
     int time_used, memory_used;
     int re_signum;
     int re_call;
     const char* re_file;
+    int re_file_flag;
 };
 
 struct Runobj {
@@ -64,15 +65,8 @@ struct Runobj {
 {PyErr_SetString(PyExc_Exception,msg); return -1;}
 
 
-
-
-
-
-
-
-
-
-
-
+#if PY_MAJOR_VERSION >= 3
+#define IS_PY3
+#endif
 
 #endif

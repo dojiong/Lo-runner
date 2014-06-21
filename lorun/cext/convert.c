@@ -27,9 +27,17 @@ int initCalls(PyObject *li, u_char calls[]) {
     len = PyList_Size(li);
     for (i = 0; i < len; i++) {
         t = PyList_GetItem(li, i);
-        if (PyLong_Check(t))
+        if (t == NULL) {return -1;}
+
+        #ifdef IS_PY3
+        if (!PyLong_Check(t))
+            RAISE1("calls must be a list of numbers.");
+        calls[PyLong_AsLong(t)] = 1;
+        #else
+        if (!PyInt_Check(t) && !PyLong_Check(t))
             RAISE1("calls must be a list of numbers.");
         calls[PyInt_AsLong(t)] = 1;
+        #endif
     }
 
     return 0;
@@ -58,14 +66,23 @@ PyObject *genResult(struct Result *rst) {
         }
     }
 
-    if (rst->re_signum)
+    if (rst->re_signum) {
         PyDict_SetItemString(rst_obj, "re_signum",
                 PyLong_FromLong(rst->re_signum));
-    if (rst->re_call != -1)
+    }
+    if (rst->re_call != -1) {
         PyDict_SetItemString(rst_obj, "re_call", PyLong_FromLong(rst->re_call));
-    if (rst->re_file)
-        PyDict_SetItemString(rst_obj, "re_file",
-                PyString_FromString(rst->re_file));
+    }
+    if (rst->re_file) {
+        #ifdef IS_PY3
+        PyObject *re_file = PyUnicode_FromString(rst->re_file);
+        #else
+        PyObject *re_file = PyString_FromString(rst->re_file);
+        #endif
+        PyDict_SetItemString(rst_obj, "re_file", re_file);
+        PyDict_SetItemString(rst_obj, "re_file_flag",
+            PyLong_FromLong(rst->re_file_flag));
+    }
 
     return rst_obj;
 }
@@ -82,11 +99,24 @@ char * const * genRunArgs(PyObject *args_obj) { //generate the argsments for exe
     args = (const char**) malloc(sizeof(char*) * (len + 1));
 
     for (i = 0; i < len; i++) {
+        #ifdef IS_PY3
+        PyObject *arg_bytes;
+        #endif
+
         if ((arg = PyList_GetItem(args_obj, i)) == NULL) {
             free(args);
             return NULL;
         }
+
+        #ifdef IS_PY3
+        arg_bytes = PyUnicode_AsUTF8String(arg);
+        if (arg_bytes == NULL) {return NULL;}
+        args[i] = PyBytes_AsString(arg_bytes);
+        #else
         args[i] = PyString_AsString(arg);
+        #endif
+
+        if (args[i] == NULL) {return NULL;}
     }
     args[i] = NULL;
 

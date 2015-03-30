@@ -27,3 +27,15 @@ For check one output:
     crst = lorun.check(fout.fileno(), ftemp.fileno())
 
 
+trace
+-----
+
+You can set runcfg['trace'] to True to ensure runner's security.
+
+Here is a simple usage:
+
+```
+runcfg['trace'] = True
+runcfg['calls'] = [1, 2, 3, 4] # system calls that could be used by testing programs
+runcfg['files'] = {'/etc/ld.so.cache': 0} # open flag permitted (value is the flags of open)
+```

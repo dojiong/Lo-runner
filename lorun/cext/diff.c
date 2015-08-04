@@ -21,7 +21,7 @@
 
 int equalStr(const char *s, const char *s2) {
     const char *c1 = s, *c2 = s2;
-    while (*c1 && c2 && (*c1++ == *c2++))
+    while (*c1 && *c2 && (*c1++ == *c2++))
         ;
     if ((*c1 | *c2) == 0)
         return 1;

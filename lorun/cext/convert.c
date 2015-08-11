@@ -59,11 +59,9 @@ PyObject *genResult(struct Result *rst) {
         RAISE0("set item falure");
     }
 
-    if (!rst->judge_result) {
-        if (PyDict_SetItemString(rst_obj, "timeused", t)
-                || PyDict_SetItemString(rst_obj, "memoryused", m)) {
-            RAISE0("set item failure");
-        }
+    if (PyDict_SetItemString(rst_obj, "timeused", t)
+            || PyDict_SetItemString(rst_obj, "memoryused", m)) {
+        RAISE0("set item failure");
     }
 
     if (rst->re_signum) {

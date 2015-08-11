@@ -66,7 +66,8 @@ int traceLoop(struct Runobj *runobj, struct Result *rst, pid_t pid) {
             }
 
             rst->re_signum = WSTOPSIG(status);
-
+            rst->time_used = ru.ru_utime.tv_sec * 1000 + ru.ru_utime.tv_usec / 1000;
+            rst->memory_used = ru.ru_minflt * (sysconf(_SC_PAGESIZE) / 1024);
             return 0;
         }
 
@@ -186,7 +187,7 @@ int runit(struct Runobj *runobj, struct Result *rst) {
             if (dup2(runobj->fd_err, 2) == -1)
                 RAISE_EXIT("dup2 stderr failure")
 
-        if (setResLimit() == -1)
+        if (setResLimit(runobj) == -1)
             RAISE_EXIT(last_limit_err)
 
         if (runobj->runner != -1)

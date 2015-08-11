@@ -21,6 +21,6 @@
 
 #include "lorun.h"
 
-int setResLimit(void);
+int setResLimit(struct Runobj *runobj);
 extern const char *last_limit_err;
 #endif

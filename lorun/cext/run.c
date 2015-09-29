@@ -59,6 +59,8 @@ int traceLoop(struct Runobj *runobj, struct Result *rst, pid_t pid) {
                 case SIGALRM:
                 case SIGXCPU:
                     rst->judge_result = TLE;
+                    if (rst->memory_used > runobj->memory_limit)
+                        rst->judge_result = MLE;
                     break;
                 default:
                     rst->judge_result = RE;

@@ -49,7 +49,7 @@ int traceLoop(struct Runobj *runobj, struct Result *rst, pid_t pid) {
                     + ru.ru_utime.tv_usec / 1000
                     + ru.ru_stime.tv_sec * 1000
                     + ru.ru_stime.tv_usec / 1000;
-            rst->memory_used = ru.ru_maxrss * (sysconf(_SC_PAGESIZE) / 1024);
+            rst->memory_used = ru.ru_maxrss;
 
             switch (WSTOPSIG(status)) {
                 case SIGSEGV:
@@ -72,7 +72,7 @@ int traceLoop(struct Runobj *runobj, struct Result *rst, pid_t pid) {
                     + ru.ru_utime.tv_usec / 1000
                     + ru.ru_stime.tv_sec * 1000
                     + ru.ru_stime.tv_usec / 1000;
-            rst->memory_used = ru.ru_maxrss * (sysconf(_SC_PAGESIZE) / 1024);
+            rst->memory_used = ru.ru_maxrss;
             return 0;
         }
 
@@ -113,7 +113,7 @@ int traceLoop(struct Runobj *runobj, struct Result *rst, pid_t pid) {
             + ru.ru_utime.tv_usec / 1000
             + ru.ru_stime.tv_sec * 1000
             + ru.ru_stime.tv_usec / 1000;
-    rst->memory_used = ru.ru_maxrss * (sysconf(_SC_PAGESIZE) / 1024);
+    rst->memory_used = ru.ru_maxrss;
 
 
     if (rst->time_used > runobj->time_limit)
@@ -137,7 +137,7 @@ int waitExit(struct Runobj *runobj, struct Result *rst, pid_t pid) {
             + ru.ru_utime.tv_usec / 1000
             + ru.ru_stime.tv_sec * 1000
             + ru.ru_stime.tv_usec / 1000;
-    rst->memory_used = ru.ru_maxrss * (sysconf(_SC_PAGESIZE) / 1024);
+    rst->memory_used = ru.ru_maxrss;
 
     if (WIFSIGNALED(status)) {
         switch (WTERMSIG(status)) {
